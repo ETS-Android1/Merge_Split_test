@@ -2,4 +2,4 @@
  
 An android application that splits and merges image into chunks.
 
-![Screen 1](/ScreenShots/Screen_1)
+![Screen 1](/ScreenShots/Screen_1.png)
