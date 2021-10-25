@@ -16,10 +16,12 @@ import java.util.ArrayList;
 
 public class MergeFragment extends Fragment {
 
-    private final ArrayList<Bitmap> mChunkedImages;
+    private ArrayList<Bitmap> mChunkedImages;
+    private int mChunkNumber;
 
-    public MergeFragment(ArrayList<Bitmap> mChunks) {
+    public MergeFragment(ArrayList<Bitmap> mChunks, double mChunksNumber) {
         this.mChunkedImages = mChunks;
+        this.mChunkNumber = (int) mChunksNumber;
     }
 
     @Override
@@ -59,13 +61,13 @@ public class MergeFragment extends Fragment {
 
         //create a bitmap of a size which can hold the complete image after merging
 //        Bitmap bitmap = Bitmap.createBitmap(chunkWidth * 5, chunkHeight * 5, Bitmap.Config.ARGB_4444);
-        Bitmap bitmap = Bitmap.createBitmap(chunkWidth * 5, chunkHeight * 5, Bitmap.Config.ARGB_8888);
+        Bitmap bitmap = Bitmap.createBitmap(chunkWidth * mChunkNumber, chunkHeight * mChunkNumber, Bitmap.Config.ARGB_8888);
 
         //create a canvas for drawing all those small images
         Canvas canvas = new Canvas(bitmap);
         int count = 0;
-        for (int rows = 0; rows < 5; rows++) {
-            for (int cols = 0; cols < 5; cols++) {
+        for (int rows = 0; rows < mChunkNumber; rows++) {
+            for (int cols = 0; cols < mChunkNumber; cols++) {
                 canvas.drawBitmap(mChunkedImages.get(count), chunkWidth * cols, chunkHeight * rows, null);
                 count++;
             }

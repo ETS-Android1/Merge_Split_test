@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 import androidx.annotation.Nullable;
@@ -26,6 +27,8 @@ public class MainFragment extends Fragment {
     private final static int GALLERY_REQUEST_CODE = 1;
     private ImageView mImageView;
     private Bitmap mBitmap;
+    private int mChunkSize;
+    private Button mSplitButton;
 
     public MainFragment() {
         // Required empty public constructor
@@ -53,8 +56,38 @@ public class MainFragment extends Fragment {
             }
         });
 
-        Button mSplitButton = view.findViewById(R.id.split_Image_Button);
-        mSplitButton.setOnClickListener(v -> {
+        mSplitButton = view.findViewById(R.id.split_Image_Button);
+
+        return view;
+    }
+
+    private void chunkSelectionAlertBox() {
+        // Create an alert builder
+        androidx.appcompat.app.AlertDialog.Builder builder = new androidx.appcompat.app.AlertDialog.Builder(requireContext());
+        builder.setTitle("Select Chunk Numbers");
+
+        // set the custom layout
+        final View customLayout = getLayoutInflater().inflate(R.layout.alertbox_chunksize, null);
+        builder.setView(customLayout);
+
+
+        RadioGroup mRadioGroup = customLayout.findViewById(R.id.radio_selection);
+        mRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            switch (checkedId) {
+                case (R.id.chunks_9):
+                    mChunkSize = 9;
+                    break;
+                case (R.id.chunks_16):
+                    mChunkSize = 16;
+                    break;
+                case (R.id.chunks_25):
+                    mChunkSize = 25;
+                    break;
+            }
+        });
+
+        // add a positive button
+        builder.setPositiveButton("Ok", (dialog, which) -> {
             getParentFragmentManager()
                     .beginTransaction()
                     .remove(MainFragment.this)
@@ -63,11 +96,15 @@ public class MainFragment extends Fragment {
             getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container,
-                            new SplitViewFragment(splitImage(mBitmap, 25)), "split")
+                            new SplitViewFragment(splitImage(mBitmap, mChunkSize), mChunkSize), "split")
                     .commit();
+            dialog.dismiss();
         });
 
-        return view;
+        androidx.appcompat.app.AlertDialog dialog = builder.create();
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
     }
 
     private ArrayList<Bitmap> splitImage(Bitmap mBitmap, int chunkNumbers) {
@@ -109,6 +146,7 @@ public class MainFragment extends Fragment {
                 if (resultCode == RESULT_OK && data != null) {
                     mBitmap = uriToBitmap(data.getData());
                     mImageView.setImageBitmap(mBitmap);
+                    mSplitButton.setOnClickListener(v -> chunkSelectionAlertBox());
                 }
             } catch (Exception e) {
                 Toast.makeText(getContext(), "Error", Toast.LENGTH_SHORT).show();

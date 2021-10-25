@@ -17,12 +17,14 @@ import java.util.ArrayList;
 
 public class SplitViewFragment extends Fragment {
 
-    private final ArrayList<Bitmap> mChunks;
+    private ArrayList<Bitmap> mChunks;
     private RecyclerView mRecyclerView;
     private ImageAdapter mImageAdapter;
+    private int mChunkSize;
 
-    public SplitViewFragment(ArrayList<Bitmap> mBitmapsChunks) {
-        mChunks = mBitmapsChunks;
+    public SplitViewFragment(ArrayList<Bitmap> mBitmapsChunks, int mChunkSize) {
+        this.mChunks = mBitmapsChunks;
+        this.mChunkSize = mChunkSize;
     }
 
     @Override
@@ -45,7 +47,7 @@ public class SplitViewFragment extends Fragment {
             getParentFragmentManager()
                     .beginTransaction()
                     .replace(R.id.fragment_container,
-                            new MergeFragment(mChunks))
+                            new MergeFragment(mChunks, Math.sqrt(mChunks.size())))
                     .commit();
         });
 
@@ -57,7 +59,7 @@ public class SplitViewFragment extends Fragment {
 
     private void initRecyclerView() {
         mImageAdapter = new ImageAdapter(getContext(), mChunks);
-        GridLayoutManager manager = new GridLayoutManager(getContext(), 5);
+        GridLayoutManager manager = new GridLayoutManager(getContext(), (int) Math.sqrt(mChunkSize));
 
         mRecyclerView.setLayoutManager(manager);
         mRecyclerView.setAdapter(mImageAdapter);
